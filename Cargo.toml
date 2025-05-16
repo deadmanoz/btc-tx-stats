@@ -1,0 +1,29 @@
+[package]
+name = "btc-tx-stats"
+version = "0.1.0"
+edition = "2021"
+authors = ["deadmanoz"]
+description = "An application for analysing Bitcoin blockchain data"
+
+[dependencies]
+anyhow = "1.0"
+thiserror = "1.0"
+dotenv = "0.15"
+config = "0.13"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1", features = ["full"] }
+diesel = { version = "2.1.0", features = ["postgres", "r2d2", "chrono", "serde_json"] }
+diesel_migrations = { version = "2.1.0", features = ["postgres"] }
+r2d2 = "0.8"
+bitcoin = { version = "0.32.6", features = ["serde"] }
+hex = "0.4"
+secp256k1 = "0.20.3"
+reqwest = { version = "0.12", features = ["json", "blocking"] }
+bech32 = "0.11.0"
+
+[dev-dependencies]
+testcontainers = "0.14"

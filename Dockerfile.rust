@@ -1,0 +1,17 @@
+# This Dockerfile creates an image with Rust development tools (rustfmt, clippy, and build dependencies)
+# It's used for formatting, linting, and checking the codebase within an ephemeral container.
+FROM rust:1.82-slim-bullseye AS rust_tools_util
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libpq-dev \
+    libssl-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install rustfmt and clippy components
+RUN rustup component add clippy rustfmt
+
+# No ENTRYPOINT or CMD, will specify full command in docker run

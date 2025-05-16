@@ -1,0 +1,31 @@
+# This Dockerfile creates an image with the Diesel CLI installed.
+# It's used to run Diesel commands (e.g. migrations) in a container.
+FROM rust:1.82-slim-bullseye AS diesel_cli_builder
+
+WORKDIR /usr/src/app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libpq-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cargo install diesel_cli --no-default-features --features postgres --locked
+
+FROM debian:bullseye-slim AS diesel_cli_util
+
+WORKDIR /app
+
+RUN mkdir -p /app/bin
+
+COPY --from=diesel_cli_builder /usr/local/cargo/bin/diesel /app/bin/diesel
+
+ENV PATH="/app/bin:${PATH}"
+
+# libpq5 - runtime dependency for diesel talking to postgres
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# No ENTRYPOINT or CMD, will specify full command in docker run 

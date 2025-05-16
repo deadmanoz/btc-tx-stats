@@ -6,33 +6,8 @@ This is currently a work in progress and the schema is subject to change - proba
 
 The original motivation for this project was to understand the extent of public key exposure on the Bitcoin blockchain.
 Older script types such as P2PK and P2MS use public keys directly in the scriptPubKey, and so the public keys are directly exposed.
-Similarly, P2TR has a public key in the witness program, and so is also exposed.
+Similarly, P2TR has a "tweaked" public key in the scriptPubKey, and so is also considered exposed.
 For other script types, the public key is revealed when "addresses are reused", that is,the public key becomes exposed on-chain during the spending process.
-
-## Project Structure
-
-btc-tx-stats/
-├── migrations/         - Diesel database migrations
-├── scripts/            - Helper scripts for Docker
-├── src/                - Rust application code
-├── .env                - Environment variables configuration
-├── Cargo.lock          - Rust dependencies lock file
-├── Cargo.toml          - Rust project and dependencies configuration
-├── compose.yaml        - Docker services configuration
-├── diesel.toml         - Diesel ORM configuration
-├── Dockerfile.app      - Main Rust application container
-├── Dockerfile.diesel   - Container for DB migrations and schema generation
-├── Dockerfile.rust     - Container for Rust toolchain (cargo fmt, clippy, etc.)
-├── justfile            - Common operations runner
-├── LICENSE             - Project license
-└── README.md           - Project documentation
-
-### Docker Containers
-The project uses three different Docker containers:
-
-- `Dockerfile.app`: Main Rust application container that runs the Bitcoin blockchain data processing application
-- `Dockerfile.rust`: Container with Rust toolchain for development tasks (formatting, linting, checking)
-- `Dockerfile.diesel`: Minimal container for database migrations and schema generation
 
 ## Technologies Used
 
@@ -46,6 +21,30 @@ The project uses three different Docker containers:
 
 - Docker and Docker Compose
 - Just command runner (optional, for running commands from the `justfile`)
+
+## Project Structure
+
+- `migrations/` - Diesel database migrations
+- `scripts/` - Helper scripts for Docker
+- `src/` - Rust application code
+- `.env` - Environment variables configuration
+- `Cargo.lock` - Rust dependencies lock file
+- `Cargo.toml` - Rust project and dependencies configuration
+- `compose.yaml` - Docker services configuration
+- `diesel.toml` - Diesel ORM configuration
+- `Dockerfile.app` - Main Rust application container
+- `Dockerfile.diesel` - Container for DB migrations and schema generation
+- `Dockerfile.rust` - Container for Rust toolchain (cargo fmt, clippy, etc.)
+- `justfile` - Common operations runner
+- `LICENSE` - Project license
+- `README.md` - Project documentation
+
+### Docker Containers
+The project uses three different Docker containers:
+
+- `Dockerfile.app`: Main Rust application container that runs the Bitcoin blockchain data processing application
+- `Dockerfile.rust`: Container with Rust toolchain for development tasks (formatting, linting, checking)
+- `Dockerfile.diesel`: Minimal container for database migrations and schema generation
 
 ## Getting Started
 
@@ -136,9 +135,12 @@ Some elements of the DB schema might seem strange, there's sometimes logic to it
 In the case of the `transactions` table, one would think that the `transaction_id` alone could be a primary key,
 but instead it's a composite primary key of `transaction_id` and `block_height`.
 
-This is because of a edge case in Bitcoin's history. There was a unique situation in Bitcoin's history where the
-same transaction ID (`e3bf3d07d4b0375638d5f1db5255fe07ba2c4cb067cd81b84ee974b6585fb468`) occurred in multiple blocks:
-91,722 and 91,880 (aside: BIP 30 was implemented to prevent blocks from containing duplicate TXIDs).
+This is because of an [edge case in Bitcoin's history](https://bitcoindevs.xyz/decoding/inputs-prev-txid).
+There was a unique situation in Bitcoin's history where the same transaction ID
+(`e3bf3d07d4b0375638d5f1db5255fe07ba2c4cb067cd81b84ee974b6585fb468`) occurred in multiple blocks:
+[91,722](https://mempool.space/block/00000000000271a2dc26e7667f8419f2e15416dc6955e5a6c6cdf3f2574dd08e) and
+[91,880](https://mempool.space/block/00000000000743f190a18c5577a3c2d2a1f610ae9601ac046a38084ccb7cd721).
+Aside: BIP 30 was implemented to prevent blocks from containing duplicate TXIDs.
 
 ## License
 
