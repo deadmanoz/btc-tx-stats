@@ -13,7 +13,6 @@ use bitcoin::blockdata::opcodes::all::*;
 use bitcoin::blockdata::script::Instruction;
 use bitcoin::hashes::{hash160, Hash};
 use bitcoin::script::Script;
-use secp256k1::PublicKey;
 
 /// Processes Bitcoin blocks and extracts analytics data
 pub struct BlockProcessor {
@@ -69,7 +68,7 @@ impl BlockProcessor {
                 }
                 Err(e) => {
                     error!(
-                        "Failed to process block at height {}: {}",
+                        "Failed to process block at height {}: {:#}",
                         current_height, e
                     );
                     return Err(e);
@@ -114,7 +113,7 @@ impl BlockProcessor {
                             current_height += 1;
                         }
                         Err(e) => {
-                            error!("Error processing block {}: {}", current_height, e);
+                            error!("Error processing block {}: {:#}", current_height, e);
 
                             // Retry with backoff
                             let mut retries = 0;
@@ -136,7 +135,7 @@ impl BlockProcessor {
                                     }
                                     Err(retry_e) => {
                                         error!(
-                                            "Retry {} failed for block {}: {}",
+                                            "Retry {} failed for block {}: {:#}",
                                             retries, current_height, retry_e
                                         );
                                     }
@@ -145,16 +144,19 @@ impl BlockProcessor {
 
                             if !retry_success {
                                 error!(
-                                    "Failed to process block {} after {} retries",
+                                    "Failed to process block {} after {} retries: {:#}",
                                     current_height,
-                                    Self::MAX_RETRIES
+                                    Self::MAX_RETRIES,
+                                    e // Use the original error 'e' that caused retries for context
                                 );
                                 // Exit application if block processing fails after max retries
-                                return Err(anyhow::anyhow!(
+                                // Ensure the original error is chained for full context.
+                                let current_error = anyhow::anyhow!(
                                     "Failed to process block {} after {} retries - exiting",
                                     current_height,
                                     Self::MAX_RETRIES
-                                ));
+                                );
+                                return Err(current_error.context(e));
                             }
                         }
                     }
@@ -417,8 +419,8 @@ fn extract_address_from_script(script: &Script) -> Option<ScriptInfo> {
     // P2PK (Pay to Public Key)
     // P2PK is of the form: <pubkey> OP_CHECKSIG
     else if instructions.len() == 2
-    && matches!(instructions[0], Instruction::PushBytes(_))
-    && (instructions[1].opcode() == Some(OP_CHECKSIG))
+        && matches!(instructions[0], Instruction::PushBytes(_))
+        && (instructions[1].opcode() == Some(OP_CHECKSIG))
     {
         if let Instruction::PushBytes(pubkey_bytes) = &instructions[0] {
             if pubkey_bytes.len() == 33 || pubkey_bytes.len() == 65 {
@@ -431,7 +433,7 @@ fn extract_address_from_script(script: &Script) -> Option<ScriptInfo> {
                 });
 
                 return Some(ScriptInfo {
-                    address: pubkey_hex,  // Use the pubkey hex directly as address
+                    address: pubkey_hex, // Use the pubkey hex directly as address
                     script_type: "p2pk".to_string(),
                     extra_data: Some(extra_data),
                 });

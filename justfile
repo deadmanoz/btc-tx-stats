@@ -176,7 +176,7 @@ db-migrate: up-db build-diesel-util-image
 # Regenerate src/db/schema.rs using the standalone diesel_cli_util container
 # This connects to the 'postgres' service on the 'btc_network'.
 # DATABASE_URL is constructed here for the diesel_cli_util container.
-db-schema-generate: up-db build-diesel-util-image
+db-schema: up-db build-diesel-util-image
     @echo "Generating database schema (src/db/schema.rs) using standalone diesel_cli_util container..."
     docker run --rm --network=btc_network \
         -v "$(pwd)/src/db:/app/src/db" \
@@ -187,5 +187,5 @@ db-schema-generate: up-db build-diesel-util-image
     @echo "src/db/schema.rs generated."
 
 # A combined command to migrate and then regenerate schema
-db-setup: db-migrate db-schema-generate
+db-setup: db-migrate db-schema
     @echo "Database setup (migrate + schema generate) complete."

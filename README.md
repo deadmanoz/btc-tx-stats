@@ -56,7 +56,7 @@ The project uses three different Docker containers:
 
 2. Create a `.env` file with your Bitcoin node connection details:
    ```
-   # Bitcoin Core RPC connection
+   # Postgres connection
    POSTGRES_USER=<username>
    POSTGRES_PASSWORD=<password>
    POSTGRES_DB=<database_name> # e.g. btc_analytics
@@ -126,7 +126,7 @@ The `justfile` provides shortcuts for common operations:
 - `just upgrade-deps` - Upgrade dependencies in Cargo.lock to latest compatible versions
 - `just up-db` - Ensure PostgreSQL service is up and healthy
 - `just db-migrate` - Run database migrations
-- `just db-schema-generate` - Generate src/db/schema.rs
+- `just db-schema` - Generate src/db/schema.rs
 - `just db-setup` - Run migrations and generate schema
 
 ## Notes

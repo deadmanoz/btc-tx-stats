@@ -133,7 +133,7 @@ fn run() -> Result<()> {
 
             // Do the work!!!
             if let Err(e) = processor.process_all_blocks(next_block_to_process_if_needed).await {
-                error!("Error during sync (process_all_blocks from {}): {}. Retrying...", next_block_to_process_if_needed, e);
+                error!("Error during sync (process_all_blocks from {}): {:#}. Retrying...", next_block_to_process_if_needed, e);
                 tokio::time::sleep(Duration::from_secs(1)).await;
             } else {
                 info!("Sync iteration (process_all_blocks from {}) completed. Re-checking status shortly.", next_block_to_process_if_needed);

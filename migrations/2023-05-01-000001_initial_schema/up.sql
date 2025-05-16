@@ -54,7 +54,7 @@ CREATE INDEX idx_txid_block_index_txid ON txid_block_index(transaction_id);
 -- All unique addresses
 CREATE TABLE addresses (
     address_id BIGSERIAL PRIMARY KEY,
-    address_string VARCHAR(100) NOT NULL UNIQUE,
+    address_string VARCHAR(255) NOT NULL UNIQUE,
     script_type VARCHAR(20) NOT NULL REFERENCES script_types(script_type),
     first_seen_block_height INTEGER NOT NULL,
     total_receive_count INTEGER NOT NULL DEFAULT 0,

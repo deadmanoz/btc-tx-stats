@@ -47,7 +47,7 @@ pub struct Transaction {
 #[derive(Insertable)]
 #[diesel(table_name = addresses)]
 pub struct NewAddress {
-    pub address_string: String, // VARCHAR(100)
+    pub address_string: String, // VARCHAR(255)
     pub script_type: String,    // VARCHAR(20)
     pub first_seen_block_height: i32,
     pub script_extra_data: Option<Value>, // JSONB

@@ -29,7 +29,7 @@ diesel::table! {
 diesel::table! {
     addresses (address_id) {
         address_id -> Int8,
-        #[max_length = 100]
+        #[max_length = 255]
         address_string -> Varchar,
         #[max_length = 20]
         script_type -> Varchar,
